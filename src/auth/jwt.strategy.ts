@@ -1,25 +1,28 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
-import { AuthService } from './auth.service'; // Asegúrate de crear AuthService
+import { AuthService } from './auth.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private authService: AuthService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: 'your-secret-key', // Debe coincidir con el que usaste al firmar el token
+      secretOrKey: 'P1NOcxwALkkNGUCJ4RO37Y5iT8XKsNQRNBMsGPeHqlY',
     });
   }
 
   async validate(payload: any) {
-    // Aquí realizamos la validación del usuario basado en la información del token
+    console.log('JWT Payload:', payload);
+
     const user = await this.authService.validateUserById(payload.sub);
 
     if (!user) {
+      console.log('User not found');
       throw new UnauthorizedException();
     }
 
-    return user; // Esto permitirá que el usuario se adjunte en la solicitud (request.user)
+    console.log('User authenticated:', user);
+    return user;
   }
 }
